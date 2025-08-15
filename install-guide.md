@@ -28,7 +28,7 @@ yunohost domain list
 - 10 GB d'espace disque libre
 - Un domaine configuré avec SSL
 
-## 🚀 Installation de LiberChat Server
+## 🚀 Installation de Liberchat
 
 ### Étape 1 : Préparation
 
@@ -47,7 +47,7 @@ yunohost domain list
 
 1. **Lancez l'installation**
    ```bash
-   yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+   yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
    ```
 
 2. **Répondez aux questions d'installation**
@@ -82,7 +82,7 @@ yunohost app list
 yunohost log show
 
 # Vérifier le statut des services
-systemctl status liberchatserver
+systemctl status liberchat
 ```
 
 ## 🔄 Mise à jour
@@ -91,7 +91,7 @@ systemctl status liberchatserver
 
 ```bash
 # Mettre à jour vers la dernière version
-yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app upgrade liberchat -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
 ```
 
 ### Mise à jour automatique (optionnel)
@@ -105,7 +105,7 @@ yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-M
    ```bash
    #!/bin/bash
    echo "Vérification des mises à jour LiberChat..."
-   yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+   yunohost app upgrade liberchat -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
    echo "Mise à jour terminée !"
    ```
 
@@ -146,7 +146,7 @@ sudo netstat -tlnp | grep :3000
 sudo systemctl stop nom-du-service
 
 # Relancer l'installation
-yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
 ```
 
 ### Problème : Application inaccessible après installation
@@ -155,12 +155,12 @@ yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/mai
 
 1. **Vérifier le statut du service**
    ```bash
-   systemctl status liberchatserver
+   systemctl status liberchat
    ```
 
 2. **Vérifier les logs**
    ```bash
-   journalctl -u liberchatserver -f
+   journalctl -u liberchat -f
    ```
 
 3. **Vérifier la configuration nginx**
@@ -192,23 +192,23 @@ sudo -u postgres psql -l
 #!/bin/bash
 echo "=== Vérification LiberChat ==="
 echo "Statut du service:"
-systemctl is-active liberchatserver
+systemctl is-active liberchat
 
 echo "Utilisation mémoire:"
 ps aux | grep liberchat | grep -v grep
 
 echo "Espace disque:"
-df -h /var/www/liberchatserver
+df -h /var/www/liberchat
 
 echo "Dernières erreurs:"
-journalctl -u liberchatserver --since "1 hour ago" | grep ERROR
+journalctl -u liberchat --since "1 hour ago" | grep ERROR
 ```
 
 ### Sauvegarde
 
 ```bash
 # Créer une sauvegarde
-yunohost backup create --apps liberchatserver
+yunohost backup create --apps liberchat
 
 # Lister les sauvegardes
 yunohost backup list
@@ -239,7 +239,7 @@ yunohost backup restore nom-de-la-sauvegarde
 3. **Surveillez les logs**
    ```bash
    # Configurer logrotate pour éviter les logs trop volumineux
-   sudo nano /etc/logrotate.d/liberchatserver
+   sudo nano /etc/logrotate.d/liberchat
    ```
 
 ## 📞 Support

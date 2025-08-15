@@ -107,7 +107,7 @@ Notes de version:
 Lien: {html_url}
 
 Pour mettre à jour vos applications YunoHost:
-yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app upgrade liberchat -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
 
 ---
 Notification automatique du LiberChat Marketplace
@@ -143,8 +143,8 @@ Notification automatique du LiberChat Marketplace
             
             # Commande de mise à jour
             cmd = [
-                "yunohost", "app", "upgrade", "liberchatserver",
-                "-u", "https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh"
+                "yunohost", "app", "upgrade", "liberchat",
+                "-u", "https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh"
             ]
             
             logging.info(f"Déclenchement de la mise à jour automatique: {' '.join(cmd)}")

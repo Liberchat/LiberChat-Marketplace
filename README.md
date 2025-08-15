@@ -1,39 +1,39 @@
-# LiberChat Marketplace
+# Liberchat Marketplace
 
-Bienvenue dans la marketplace communautaire LiberChat ! Ce dépôt contient des applications YunoHost développées et maintenues par la communauté LiberChat, indépendamment du catalogue officiel YunoHost.
+Bienvenue dans la marketplace communautaire Liberchat ! Ce dépôt contient des applications YunoHost développées et maintenues par la communauté Liberchat, indépendamment du catalogue officiel YunoHost.
 
 ## 🚀 Applications disponibles
 
-### LiberChat Server
-Une alternative libre et auto-hébergée à ChatGPT avec interface web moderne.
+### Liberchat
+Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement de bout en bout, partage de fichiers et support multi-domaines incluant Tor.
 
-- **Version actuelle :** 1.0.0
+- **Version actuelle :** 6.1.20
 - **Statut :** ✅ Stable
-- **Dépendances :** Node.js 18+, PostgreSQL, Redis
+- **Dépendances :** Node.js 18+, npm
 
 ## 📦 Installation rapide
 
 ### Installer une application
 
 ```bash
-# LiberChat Server
-yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+# Liberchat
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
 ```
 
 ### Mettre à jour une application
 
 ```bash
-# Mettre à jour LiberChat Server
-yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+# Mettre à jour Liberchat
+yunohost app upgrade liberchat -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
 ```
 
 ## 🔧 Dépendances système
 
 Avant d'installer les applications, assurez-vous que votre serveur YunoHost dispose de :
 
-- **RAM minimum :** 2 GB (4 GB recommandés)
-- **Espace disque :** 10 GB libres minimum
-- **YunoHost version :** 11.0+
+- **RAM minimum :** 50 MB
+- **Espace disque :** 50 MB libres minimum
+- **YunoHost version :** 11.2+
 - **Domaine configuré** avec certificat SSL
 
 ## 📚 Guides d'installation détaillés
@@ -95,7 +95,7 @@ echo "0 9 * * * /path/to/check-updates.sh" | crontab -
 
 ### Structure requise pour une app
 ```
-apps/votre-app_ynh/
+apps/liberchat_ynh/
 ├── manifest.json
 ├── scripts/
 │   ├── install

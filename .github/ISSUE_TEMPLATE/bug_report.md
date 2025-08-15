@@ -38,7 +38,7 @@ Une description claire et concise de ce qui se passe réellement.
 yunohost log show
 
 # Logs de l'application
-sudo journalctl -u liberchatserver --no-pager
+sudo journalctl -u liberchat --no-pager
 
 # Logs nginx (si pertinent)
 sudo tail -n 50 /var/log/nginx/error.log
