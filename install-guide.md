@@ -47,7 +47,7 @@ yunohost domain list
 
 1. **Lancez l'installation**
    ```bash
-   yunohost app install https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+   yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
    ```
 
 2. **Répondez aux questions d'installation**
@@ -91,7 +91,7 @@ systemctl status liberchatserver
 
 ```bash
 # Mettre à jour vers la dernière version
-yunohost app upgrade liberchatserver -u https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
 ```
 
 ### Mise à jour automatique (optionnel)
@@ -105,7 +105,7 @@ yunohost app upgrade liberchatserver -u https://github.com/votre-compte/LiberCha
    ```bash
    #!/bin/bash
    echo "Vérification des mises à jour LiberChat..."
-   yunohost app upgrade liberchatserver -u https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+   yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
    echo "Mise à jour terminée !"
    ```
 
@@ -146,7 +146,7 @@ sudo netstat -tlnp | grep :3000
 sudo systemctl stop nom-du-service
 
 # Relancer l'installation
-yunohost app install https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
 ```
 
 ### Problème : Application inaccessible après installation
@@ -246,7 +246,7 @@ yunohost backup restore nom-de-la-sauvegarde
 
 Si vous rencontrez des problèmes non couverts par ce guide :
 
-1. **Consultez les issues GitHub** : [Issues du projet](https://github.com/votre-compte/LiberChat-Marketplace/issues)
+1. **Consultez les issues GitHub** : [Issues du projet](https://github.com/Liberchat/LiberChat-Marketplace/issues)
 2. **Créez un nouveau ticket** avec :
    - Version de YunoHost (`yunohost --version`)
    - Logs d'erreur (`yunohost log show`)

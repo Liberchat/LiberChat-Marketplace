@@ -227,7 +227,7 @@ echo "0 3 * * 0 /home/admin/maintenance-liberchat.sh >> /var/log/liberchat-maint
 ### Support et communauté
 
 - **Documentation officielle** : [docs.liberchat.ai](https://docs.liberchat.ai)
-- **Issues GitHub** : [github.com/votre-compte/LiberChat-Marketplace/issues](https://github.com/votre-compte/LiberChat-Marketplace/issues)
+- **Issues GitHub** : [github.com/Liberchat/LiberChat-Marketplace/issues](https://github.com/Liberchat/LiberChat-Marketplace/issues)
 - **Forum YunoHost** : [forum.yunohost.org](https://forum.yunohost.org)
 
 Pour toute question spécifique, n'hésitez pas à créer un ticket sur GitHub avec les logs et la description détaillée du problème.

@@ -17,14 +17,14 @@ Une alternative libre et auto-hébergée à ChatGPT avec interface web moderne.
 
 ```bash
 # LiberChat Server
-yunohost app install https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
 ```
 
 ### Mettre à jour une application
 
 ```bash
 # Mettre à jour LiberChat Server
-yunohost app upgrade liberchatserver -u https://github.com/votre-compte/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
+yunohost app upgrade liberchatserver -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchatserver_ynh
 ```
 
 ## 🔧 Dépendances système
@@ -77,7 +77,7 @@ Pour recevoir les notifications de nouvelles versions :
 
 ```bash
 # Télécharger le script de vérification
-wget https://raw.githubusercontent.com/votre-compte/LiberChat-Marketplace/main/scripts/check-updates.sh
+wget https://raw.githubusercontent.com/Liberchat/LiberChat-Marketplace/main/scripts/check-updates.sh
 chmod +x check-updates.sh
 
 # Ajouter à crontab pour vérification quotidienne
@@ -113,7 +113,7 @@ Ce projet est sous licence MIT. Voir le fichier [LICENSE](./LICENSE) pour plus d
 
 ## 🆘 Support
 
-- **Issues GitHub :** [Créer un ticket](https://github.com/votre-compte/LiberChat-Marketplace/issues)
+- **Issues GitHub :** [Créer un ticket](https://github.com/Liberchat/LiberChat-Marketplace/issues)
 - **Forum YunoHost :** [forum.yunohost.org](https://forum.yunohost.org)
 - **Documentation YunoHost :** [yunohost.org/packaging_apps](https://yunohost.org/packaging_apps)
 

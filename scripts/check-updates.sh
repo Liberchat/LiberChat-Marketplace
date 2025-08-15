@@ -3,8 +3,8 @@
 # Script de vérification des mises à jour LiberChat Marketplace
 # Usage: ./check-updates.sh [app_name]
 
-REPO_URL="https://api.github.com/repos/votre-compte/LiberChat-Marketplace"
-NOTIFICATION_EMAIL="anarchymedialibertaire@gmail.com"
+REPO_URL="https://api.github.com/repos/Liberchat/LiberChat-Marketplace"
+NOTIFICATION_EMAIL="admin@votre-domaine.tld"
 LOG_FILE="/var/log/liberchat-updates.log"
 
 # Fonction de logging

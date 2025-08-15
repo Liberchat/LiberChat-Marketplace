@@ -7,14 +7,14 @@
         "fr": "Alternative auto-hébergée à ChatGPT avec interface web moderne"
     },
     "version": "1.0.0~ynh1",
-    "url": "https://github.com/votre-compte/liberchat",
+    "url": "https://github.com/Liberchat/liberchat",
     "upstream": {
         "license": "MIT",
         "website": "https://liberchat.ai",
         "demo": "https://demo.liberchat.ai",
         "admindoc": "https://docs.liberchat.ai/install/configuration",
         "userdoc": "https://docs.liberchat.ai",
-        "code": "https://github.com/votre-compte/liberchat"
+        "code": "https://github.com/Liberchat/liberchat"
     },
     "license": "MIT",
     "maintainer": {
@@ -67,7 +67,7 @@
     "resources": {
         "sources": {
             "main": {
-                "url": "https://github.com/votre-compte/liberchat/archive/refs/tags/v1.0.0.tar.gz",
+                "url": "https://github.com/Liberchat/liberchat/archive/refs/tags/v1.0.0.tar.gz",
                 "sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef"
             }
         },
