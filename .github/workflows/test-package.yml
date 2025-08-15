@@ -1,0 +1,76 @@
+name: Test YunoHost Package
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        yunohost_version: ["11.2", "testing"]
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up YunoHost testing environment
+      run: |
+        # Installation de YunoHost en mode testing
+        curl https://install.yunohost.org | bash -s -- -a
+        
+    - name: Test package linting
+      run: |
+        # Vérification de la syntaxe du manifest
+        python3 -m json.tool apps/liberchatserver_ynh/manifest.json > /dev/null
+        
+        # Vérification des scripts
+        for script in apps/liberchatserver_ynh/scripts/*; do
+          if [ -f "$script" ]; then
+            bash -n "$script"
+          fi
+        done
+    
+    - name: Test installation
+      run: |
+        # Test d'installation sur domaine de test
+        sudo yunohost app install apps/liberchatserver_ynh \
+          --force \
+          --args "domain=test.local&path=/&admin=admin&is_public=1&language=en&password=testpassword123"
+    
+    - name: Test basic functionality
+      run: |
+        # Vérifier que l'app est installée
+        yunohost app list | grep liberchatserver
+        
+        # Vérifier que le service fonctionne
+        systemctl is-active liberchatserver
+        
+        # Test HTTP basique
+        curl -f http://test.local/ || exit 1
+    
+    - name: Test upgrade
+      run: |
+        # Test de mise à jour
+        sudo yunohost app upgrade liberchatserver --file apps/liberchatserver_ynh
+    
+    - name: Test backup/restore
+      run: |
+        # Test de sauvegarde
+        sudo yunohost backup create --apps liberchatserver
+        
+        # Test de suppression
+        sudo yunohost app remove liberchatserver
+        
+        # Test de restauration
+        backup_name=$(yunohost backup list --output-as json | jq -r '.[0].name')
+        sudo yunohost backup restore "$backup_name"
+    
+    - name: Cleanup
+      if: always()
+      run: |
+        # Nettoyage
+        sudo yunohost app remove liberchatserver || true
