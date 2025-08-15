@@ -11,6 +11,13 @@ Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement d
 - **Statut :** ✅ Stable
 - **Dépendances :** Node.js 18+, npm
 
+### [Nouvelle App]
+Description de votre nouvelle application.
+
+- **Version actuelle :** X.X.X
+- **Statut :** ✅ Stable / 🚧 Beta / 🔬 Expérimental
+- **Dépendances :** Liste des dépendances
+
 ## 📦 Installation rapide
 
 ### Installer une application
@@ -18,6 +25,9 @@ Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement d
 ```bash
 # Liberchat
 yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
+
+# Nouvelle App
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/nouvelle-app_ynh
 ```
 
 ### Mettre à jour une application

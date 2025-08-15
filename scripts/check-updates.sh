@@ -82,7 +82,7 @@ main() {
     local apps_updated=0
     
     # Liste des applications de la marketplace
-    local marketplace_apps=("liberchat")
+    local marketplace_apps=("liberchat" "nouvelle-app")
     
     for app in "${marketplace_apps[@]}"; do
         if check_app_update "$app"; then
