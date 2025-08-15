@@ -1,0 +1,175 @@
+#!/bin/bash
+
+source /usr/share/yunohost/helpers
+
+#=================================================
+# RETRIEVE ARGUMENTS FROM THE MANIFEST
+#=================================================
+
+domain=$YNH_APP_ARG_DOMAIN
+path_url=$YNH_APP_ARG_PATH
+admin=$YNH_APP_ARG_ADMIN
+password=$YNH_APP_ARG_PASSWORD
+
+app=$YNH_APP_INSTANCE_NAME
+
+#=================================================
+# CHECK IF THE APP CAN BE INSTALLED WITH THESE ARGS
+#=================================================
+
+ynh_script_progression --message="Validating installation parameters..." --weight=1
+
+#=================================================
+# STORE SETTINGS FROM MANIFEST
+#=================================================
+
+ynh_script_progression --message="Storing installation settings..." --weight=1
+
+ynh_app_setting_set --app=$app --key=domain --value=$domain
+ynh_app_setting_set --app=$app --key=path --value=$path_url
+ynh_app_setting_set --app=$app --key=admin --value=$admin
+
+#=================================================
+# STANDARD MODIFICATIONS
+#=================================================
+
+# Find an available port
+ynh_script_progression --message="Finding an available port..." --weight=1
+port=$(ynh_find_port --port=3001)
+ynh_app_setting_set --app=$app --key=port --value=$port
+
+# Get install directory from provisioning
+install_dir=$(ynh_app_setting_get --app=$app --key=install_dir)
+
+# Create a dedicated user
+ynh_script_progression --message="Configuring system user..." --weight=1
+ynh_system_user_create --username=$app --home_dir="$install_dir"
+
+#=================================================
+# SETUP SOURCE FILES
+#=================================================
+
+ynh_script_progression --message="Setting up source files..." --weight=1
+
+# Copy application files from app directory
+cp -r ../src ../server "$install_dir/" 2>/dev/null || true
+cp ../package.json ../package-lock.json ../index.html ../vite.config.ts ../tailwind.config.js ../postcss.config.js ../eslint.config.js "$install_dir/" 2>/dev/null || true
+cp ../tsconfig.json ../tsconfig.app.json ../tsconfig.node.json "$install_dir/" 2>/dev/null || true
+
+chmod 750 "$install_dir"
+chown -R $app:www-data "$install_dir"
+
+#=================================================
+# NGINX CONFIGURATION
+#=================================================
+
+ynh_script_progression --message="Configuring NGINX web server..." --weight=1
+
+# Create a dedicated NGINX config
+ynh_add_nginx_config
+
+#=================================================
+# SPECIFIC SETUP
+#=================================================
+
+# Get data directory from provisioning
+data_dir=$(ynh_app_setting_get --app=$app --key=data_dir)
+
+# Install Node.js
+ynh_script_progression --message="Installing Node.js..." --weight=5
+ynh_exec_warn_less ynh_install_nodejs --nodejs_version=18
+
+# Install dependencies
+ynh_script_progression --message="Installing dependencies..." --weight=10
+pushd "$install_dir"
+	ynh_use_nodejs
+	
+	# Install all dependencies including devDependencies for build
+	ynh_exec_as $app env $ynh_node_load_PATH npm install --include=dev
+	
+	# Install server dependencies
+	pushd server
+		ynh_exec_as $app env $ynh_node_load_PATH npm install
+	popd
+	
+	# Build the React application
+	ynh_script_progression --message="Building React application..." --weight=5
+	ynh_exec_as $app env $ynh_node_load_PATH npm run build
+	
+	# Verify build succeeded
+	if [ ! -d "dist" ] || [ ! -f "dist/index.html" ]; then
+		ynh_print_err "Build failed: dist folder or index.html not found"
+		ls -la
+		exit 1
+	fi
+	
+	ynh_print_info "Build successful: $(ls -la dist/)"
+popd
+
+# Generate JWT secret
+jwt_secret=$(ynh_string_random --length=64)
+ynh_app_setting_set --app=$app --key=jwt_secret --value=$jwt_secret
+
+# Create environment file
+ynh_script_progression --message="Configuring environment..." --weight=1
+ynh_add_config --template="env" --destination="$install_dir/.env"
+chown $app:$app "$install_dir/.env"
+chmod 600 "$install_dir/.env"
+
+#=================================================
+# SYSTEMD
+#=================================================
+
+ynh_script_progression --message="Configuring a systemd service..." --weight=1
+
+# Create a dedicated systemd config
+ynh_add_systemd_config
+
+#=================================================
+# GENERIC FINALIZATION
+#=================================================
+
+# Start a systemd service
+ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+
+# Use logrotate to manage application logfile(s)
+ynh_script_progression --message="Configuring log rotation..." --weight=1
+ynh_use_logrotate
+
+#=================================================
+# SETUP PERMISSIONS
+#=================================================
+
+ynh_script_progression --message="Configuring permissions..." --weight=1
+
+# Create public permission for share routes
+ynh_permission_create --permission="share" --url="$domain$path_url/share" --allowed="visitors" --show_tile=false --protected=false
+ynh_permission_create --permission="api_share" --url="$domain$path_url/api/share" --allowed="visitors" --show_tile=false --protected=false
+
+#=================================================
+# INTEGRATE SERVICE IN YUNOHOST
+#=================================================
+
+ynh_script_progression --message="Integrating service in YunoHost..." --weight=1
+yunohost service add $app --description="Contacts Libres CNT-AIT" --log="/var/log/$app/$app.log"
+
+#=================================================
+# START SYSTEMD SERVICE
+#=================================================
+
+ynh_script_progression --message="Starting a systemd service..." --weight=1
+ynh_systemd_action --service_name=$app --action="start" --log_path="/var/log/$app/$app.log"
+
+#=================================================
+# RELOAD NGINX
+#=================================================
+
+ynh_script_progression --message="Reloading NGINX web server..." --weight=1
+ynh_systemd_action --service_name=nginx --action=reload
+
+#=================================================
+# END OF SCRIPT
+#=================================================
+
+ynh_script_progression --message="Installation of $app completed" --weight=1

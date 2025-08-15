@@ -30,6 +30,15 @@ yunohost domain list
 
 ## 🚀 Installation de Liberchat
 
+## 🚀 Installation de contact-cnt-ait
+
+### Étape 1 : Installation
+
+```bash
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/contact-cnt-ait_ynh
+```
+
+
 ### Étape 1 : Préparation
 
 1. **Connectez-vous à votre serveur YunoHost**

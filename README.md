@@ -11,6 +11,14 @@ Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement d
 - **Statut :** ✅ Stable
 - **Dépendances :** Node.js 18+, npm
 
+### contact-cnt-ait
+Application de gestion de contacts
+
+- **Version actuelle :** 1.0.0
+- **Statut :** ✅ Stable
+- **Dépendances :** À compléter
+
+
 ### [Nouvelle App]
 Description de votre nouvelle application.
 
@@ -25,6 +33,10 @@ Description de votre nouvelle application.
 ```bash
 # Liberchat
 yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh
+
+# contact-cnt-ait
+yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/contact-cnt-ait_ynh
+
 
 # Nouvelle App
 yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/nouvelle-app_ynh

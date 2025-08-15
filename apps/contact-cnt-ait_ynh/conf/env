@@ -1,0 +1,4 @@
+NODE_ENV=production
+PORT=__PORT__
+JWT_SECRET=__JWT_SECRET__
+DATA_DIR=__DATA_DIR__

@@ -1,0 +1,21 @@
+[Unit]
+Description=Contacts Libres CNT-AIT
+After=network.target
+
+[Service]
+Type=simple
+User=__APP__
+Group=__APP__
+WorkingDirectory=__INSTALL_DIR__/server
+Environment=NODE_ENV=production
+Environment=PORT=__PORT__
+Environment=JWT_SECRET=__JWT_SECRET__
+Environment=DATA_DIR=__DATA_DIR__
+ExecStart=__YNH_NODE__ index.js
+Restart=on-failure
+RestartSec=10
+StandardOutput=append:/var/log/__APP__/__APP__.log
+StandardError=inherit
+
+[Install]
+WantedBy=multi-user.target
