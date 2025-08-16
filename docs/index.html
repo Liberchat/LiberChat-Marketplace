@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liberchat Marketplace - Applications YunoHost Communautaires</title>
+    <meta name="description" content="Marketplace communautaire d'applications YunoHost avec validation automatique et intégration simplifiée">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏪</text></svg>">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <nav class="nav">
+            <div class="nav-brand">
+                <span class="logo">🏪</span>
+                <span class="brand-text">Liberchat Marketplace</span>
+            </div>
+            <div class="nav-links">
+                <a href="#apps" class="nav-link">Applications</a>
+                <a href="#how-it-works" class="nav-link">Comment ça marche</a>
+                <a href="#submit" class="nav-link">Soumettre</a>
+                <a href="https://github.com/Liberchat/LiberChat-Marketplace" class="nav-link github-link" target="_blank">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                    GitHub
+                </a>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1 class="hero-title">
+                    Marketplace Communautaire
+                    <span class="gradient-text">YunoHost</span>
+                </h1>
+                <p class="hero-description">
+                    Découvrez, installez et partagez des applications YunoHost avec validation automatique et intégration simplifiée.
+                </p>
+                <div class="hero-buttons">
+                    <a href="#apps" class="btn btn-primary">
+                        <span>Voir les applications</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="m9 18 6-6-6-6"/>
+                        </svg>
+                    </a>
+                    <a href="#submit" class="btn btn-secondary">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14m7-7H5"/>
+                        </svg>
+                        <span>Soumettre une app</span>
+                    </a>
+                </div>
+            </div>
+            <div class="hero-visual">
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-buttons">
+                            <span class="btn-close"></span>
+                            <span class="btn-minimize"></span>
+                            <span class="btn-maximize"></span>
+                        </div>
+                        <span class="terminal-title">YunoHost Terminal</span>
+                    </div>
+                    <div class="terminal-body">
+                        <div class="terminal-line">
+                            <span class="prompt">admin@yunohost:~$</span>
+                            <span class="command">yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh</span>
+                        </div>
+                        <div class="terminal-line output">
+                            <span>✅ Installation réussie !</span>
+                        </div>
+                        <div class="terminal-line">
+                            <span class="prompt">admin@yunohost:~$</span>
+                            <span class="cursor">_</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Stats Section -->
+    <section class="stats">
+        <div class="container">
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">2</div>
+                    <div class="stat-label">Applications disponibles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Validation automatique</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">< 5min</div>
+                    <div class="stat-label">Temps de validation</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Applications possibles</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Applications Section -->
+    <section id="apps" class="apps">
+        <div class="container">
+            <h2 class="section-title">Applications Disponibles</h2>
+            <p class="section-description">
+                Découvrez notre collection d'applications YunoHost testées et validées par la communauté.
+            </p>
+            
+            <div class="apps-grid">
+                <!-- Liberchat App -->
+                <div class="app-card">
+                    <div class="app-header">
+                        <div class="app-icon">💬</div>
+                        <div class="app-info">
+                            <h3 class="app-name">Liberchat</h3>
+                            <span class="app-version">v6.1.20</span>
+                        </div>
+                        <span class="app-status status-stable">Stable</span>
+                    </div>
+                    <p class="app-description">
+                        Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement de bout en bout, partage de fichiers et support multi-domaines incluant Tor.
+                    </p>
+                    <div class="app-features">
+                        <span class="feature">🔒 Chiffrement E2E</span>
+                        <span class="feature">📁 Partage de fichiers</span>
+                        <span class="feature">🌐 Multi-domaines</span>
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn btn-primary btn-install" data-app="liberchat">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Installer
+                        </button>
+                        <a href="https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/liberchat_ynh" class="btn btn-outline" target="_blank">
+                            Voir le code
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Contacts CNT-AIT App -->
+                <div class="app-card">
+                    <div class="app-header">
+                        <div class="app-icon">📇</div>
+                        <div class="app-info">
+                            <h3 class="app-name">Contacts Libres CNT-AIT</h3>
+                            <span class="app-version">v1.4</span>
+                        </div>
+                        <span class="app-status status-stable">Stable</span>
+                    </div>
+                    <p class="app-description">
+                        Application décentralisée de gestion de contacts pour la CNT-AIT avec chiffrement local et interface React moderne.
+                    </p>
+                    <div class="app-features">
+                        <span class="feature">🔐 Chiffrement local</span>
+                        <span class="feature">⚛️ Interface React</span>
+                        <span class="feature">🔑 JWT Auth</span>
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn btn-primary btn-install" data-app="contact-cnt-ait">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Installer
+                        </button>
+                        <a href="https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/contact-cnt-ait_ynh" class="btn btn-outline" target="_blank">
+                            Voir le code
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- How it works Section -->
+    <section id="how-it-works" class="how-it-works">
+        <div class="container">
+            <h2 class="section-title">Comment ça marche</h2>
+            <p class="section-description">
+                Un processus simple et automatisé pour découvrir, valider et installer des applications YunoHost.
+            </p>
+
+            <div class="process-grid">
+                <!-- For Users -->
+                <div class="process-column">
+                    <h3 class="process-title">
+                        <span class="process-icon">👥</span>
+                        Pour les utilisateurs
+                    </h3>
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Découvrir</h4>
+                                <p>Parcourez le catalogue d'applications validées</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Copier</h4>
+                                <p>Copiez la commande d'installation</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Installer</h4>
+                                <p>Exécutez sur votre serveur YunoHost</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- For Developers -->
+                <div class="process-column">
+                    <h3 class="process-title">
+                        <span class="process-icon">👨‍💻</span>
+                        Pour les développeurs
+                    </h3>
+                    <div class="process-steps">
+                        <div class="step">
+                            <div class="step-number">1</div>
+                            <div class="step-content">
+                                <h4>Soumettre</h4>
+                                <p>Créez une issue avec votre application</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">2</div>
+                            <div class="step-content">
+                                <h4>Validation</h4>
+                                <p>Tests automatiques en quelques minutes</p>
+                            </div>
+                        </div>
+                        <div class="step">
+                            <div class="step-number">3</div>
+                            <div class="step-content">
+                                <h4>Intégration</h4>
+                                <p>Ajout automatique à la marketplace</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features">
+        <div class="container">
+            <h2 class="section-title">Pourquoi choisir notre marketplace ?</h2>
+            
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🤖</div>
+                    <h3>Validation automatique</h3>
+                    <p>Tests de structure, sécurité et conformité YunoHost en moins de 5 minutes</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔒</div>
+                    <h3>Sécurité renforcée</h3>
+                    <p>Analyse automatique des vulnérabilités et bonnes pratiques de sécurité</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h3>Installation rapide</h3>
+                    <p>Une seule commande pour installer n'importe quelle application</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h3>Mises à jour automatiques</h3>
+                    <p>Notifications et gestion des mises à jour simplifiées</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Communautaire</h3>
+                    <p>Développé par et pour la communauté Liberchat</p>
+                </div>
+                
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h3>Documentation complète</h3>
+                    <p>Guides détaillés pour utilisateurs et développeurs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Submit Section -->
+    <section id="submit" class="submit">
+        <div class="container">
+            <div class="submit-content">
+                <h2 class="section-title">Soumettez votre application</h2>
+                <p class="section-description">
+                    Partagez votre application YunoHost avec la communauté. Notre système de validation automatique simplifie le processus.
+                </p>
+                
+                <div class="submit-steps">
+                    <div class="submit-step">
+                        <div class="submit-step-icon">📝</div>
+                        <div class="submit-step-content">
+                            <h3>1. Préparez votre app</h3>
+                            <p>Assurez-vous qu'elle respecte les standards YunoHost</p>
+                        </div>
+                    </div>
+                    
+                    <div class="submit-step">
+                        <div class="submit-step-icon">🚀</div>
+                        <div class="submit-step-content">
+                            <h3>2. Créez une issue</h3>
+                            <p>Utilisez notre template de soumission automatique</p>
+                        </div>
+                    </div>
+                    
+                    <div class="submit-step">
+                        <div class="submit-step-icon">✅</div>
+                        <div class="submit-step-content">
+                            <h3>3. Validation automatique</h3>
+                            <p>Notre bot valide votre app en quelques minutes</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="submit-actions">
+                    <a href="https://github.com/Liberchat/LiberChat-Marketplace/issues/new?template=submit_app.md" class="btn btn-primary btn-large" target="_blank">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 5v14m7-7H5"/>
+                        </svg>
+                        Soumettre une application
+                    </a>
+                    <a href="https://github.com/Liberchat/LiberChat-Marketplace/blob/main/CONTRIBUTING.md" class="btn btn-outline btn-large" target="_blank">
+                        📚 Guide de contribution
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Liberchat Marketplace</h3>
+                    <p>Marketplace communautaire d'applications YunoHost</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>Liens utiles</h4>
+                    <ul>
+                        <li><a href="https://github.com/Liberchat/LiberChat-Marketplace">GitHub</a></li>
+                        <li><a href="https://github.com/Liberchat/LiberChat-Marketplace/blob/main/CONTRIBUTING.md">Documentation</a></li>
+                        <li><a href="https://github.com/Liberchat/LiberChat-Marketplace/issues">Support</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h4>YunoHost</h4>
+                    <ul>
+                        <li><a href="https://yunohost.org">Site officiel</a></li>
+                        <li><a href="https://forum.yunohost.org">Forum</a></li>
+                        <li><a href="https://yunohost.org/packaging_apps">Packaging</a></li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2025 Liberchat Community. Sous licence MIT.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Install Modal -->
+    <div id="install-modal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Installation de <span id="modal-app-name"></span></h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p>Copiez et exécutez cette commande sur votre serveur YunoHost :</p>
+                <div class="code-block">
+                    <code id="install-command"></code>
+                    <button class="copy-btn" onclick="copyToClipboard()">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                            <path d="m5 15-4-4 4-4"/>
+                        </svg>
+                        Copier
+                    </button>
+                </div>
+                <div class="install-steps">
+                    <h4>Étapes d'installation :</h4>
+                    <ol>
+                        <li>Connectez-vous à votre serveur YunoHost</li>
+                        <li>Collez et exécutez la commande ci-dessus</li>
+                        <li>Suivez les instructions d'installation</li>
+                        <li>Votre application sera accessible via votre domaine</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
