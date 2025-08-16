@@ -117,22 +117,41 @@ function showCopyFeedback() {
     }, 2000);
 }
 
-// Header scroll effect
+// Header scroll effect with mobile optimization
 let lastScrollTop = 0;
+let ticking = false;
 const header = document.querySelector('.header');
 
+function updateHeader() {
+    // Only apply scroll effect on larger screens
+    if (window.innerWidth > 480) {
+        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        
+        if (scrollTop > lastScrollTop && scrollTop > 100) {
+            // Scrolling down
+            header.style.transform = 'translateY(-100%)';
+        } else {
+            // Scrolling up
+            header.style.transform = 'translateY(0)';
+        }
+        
+        lastScrollTop = scrollTop;
+    }
+    ticking = false;
+}
+
 window.addEventListener('scroll', function() {
-    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-    
-    if (scrollTop > lastScrollTop && scrollTop > 100) {
-        // Scrolling down
-        header.style.transform = 'translateY(-100%)';
-    } else {
-        // Scrolling up
+    if (!ticking) {
+        requestAnimationFrame(updateHeader);
+        ticking = true;
+    }
+});
+
+// Reset header position on resize
+window.addEventListener('resize', function() {
+    if (window.innerWidth <= 480) {
         header.style.transform = 'translateY(0)';
     }
-    
-    lastScrollTop = scrollTop;
 });
 
 // Intersection Observer for animations
@@ -255,6 +274,15 @@ document.querySelectorAll('.btn').forEach(btn => {
                 this.style.pointerEvents = 'auto';
             }, 1000);
         }
+    });
+    
+    // Add touch feedback for mobile
+    btn.addEventListener('touchstart', function() {
+        this.style.transform = 'scale(0.98)';
+    });
+    
+    btn.addEventListener('touchend', function() {
+        this.style.transform = 'scale(1)';
     });
 });
 
