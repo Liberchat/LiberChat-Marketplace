@@ -1,0 +1,107 @@
+{
+  "apps": {
+    "liberchat": {
+      "icon": "💬",
+      "featured": true,
+      "category": "Communication",
+      "tags": ["chat", "chiffrement", "décentralisé"],
+      "custom_description": "Chat décentralisé axé militant(e)s sur la confidentialité avec chiffrement de bout en bout"
+    },
+    "contact-cnt-ait": {
+      "icon": "📇",
+      "featured": true,
+      "category": "Productivité",
+      "tags": ["contacts", "gestion", "CNT-AIT"],
+      "custom_description": "Application décentralisée de gestion de contacts pour la CNT-AIT"
+    },
+    "nextcloud": {
+      "icon": "☁️",
+      "featured": false,
+      "category": "Stockage",
+      "tags": ["cloud", "fichiers", "synchronisation"]
+    },
+    "wordpress": {
+      "icon": "📝",
+      "featured": false,
+      "category": "Web",
+      "tags": ["blog", "cms", "site web"]
+    },
+    "matrix": {
+      "icon": "💬",
+      "featured": false,
+      "category": "Communication",
+      "tags": ["chat", "fédéré", "sécurisé"]
+    },
+    "mastodon": {
+      "icon": "🐘",
+      "featured": false,
+      "category": "Social",
+      "tags": ["microblog", "fédéré", "social"]
+    },
+    "peertube": {
+      "icon": "📺",
+      "featured": false,
+      "category": "Média",
+      "tags": ["vidéo", "streaming", "fédéré"]
+    },
+    "gitea": {
+      "icon": "🦊",
+      "featured": false,
+      "category": "Développement",
+      "tags": ["git", "code", "collaboration"]
+    },
+    "jellyfin": {
+      "icon": "🎬",
+      "featured": false,
+      "category": "Média",
+      "tags": ["streaming", "films", "séries"]
+    },
+    "bitwarden": {
+      "icon": "🔐",
+      "featured": false,
+      "category": "Sécurité",
+      "tags": ["mots de passe", "coffre-fort", "sécurité"]
+    }
+  },
+  "categories": {
+    "Communication": {
+      "icon": "💬",
+      "color": "#3b82f6"
+    },
+    "Productivité": {
+      "icon": "📋",
+      "color": "#10b981"
+    },
+    "Stockage": {
+      "icon": "☁️",
+      "color": "#6366f1"
+    },
+    "Web": {
+      "icon": "🌐",
+      "color": "#f59e0b"
+    },
+    "Social": {
+      "icon": "👥",
+      "color": "#ec4899"
+    },
+    "Média": {
+      "icon": "🎬",
+      "color": "#8b5cf6"
+    },
+    "Développement": {
+      "icon": "💻",
+      "color": "#06b6d4"
+    },
+    "Sécurité": {
+      "icon": "🔐",
+      "color": "#ef4444"
+    }
+  },
+  "settings": {
+    "featured_apps_limit": 6,
+    "show_categories": true,
+    "show_tags": true,
+    "default_icon": "📱",
+    "github_repo": "Liberchat/LiberChat-Marketplace"
+  }
+}

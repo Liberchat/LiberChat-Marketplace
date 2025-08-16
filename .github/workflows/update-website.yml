@@ -1,0 +1,389 @@
+name: 🔄 Update Website with New Apps
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'apps/**'
+  workflow_dispatch:
+
+jobs:
+  update-website:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🔍 Detect new or updated apps
+      id: detect-apps
+      run: |
+        echo "Scanning apps directory..."
+        
+        # Initialize arrays
+        apps_data="["
+        app_count=0
+        
+        # Scan each app directory
+        for app_dir in apps/*/; do
+          if [ -d "$app_dir" ]; then
+            app_name=$(basename "$app_dir" _ynh)
+            echo "Processing app: $app_name"
+            
+            # Read manifest file
+            if [ -f "$app_dir/manifest.toml" ]; then
+              manifest_file="$app_dir/manifest.toml"
+              
+              # Extract app info using Python
+              app_info=$(python3 << EOF
+import tomllib
+import json
+import sys
+
+try:
+    with open('$manifest_file', 'rb') as f:
+        data = tomllib.load(f)
+    
+    app_data = {
+        'id': data.get('id', '$app_name'),
+        'name': data.get('name', '$app_name'),
+        'version': data.get('version', '1.0.0'),
+        'description_fr': data.get('description', {}).get('fr', ''),
+        'description_en': data.get('description', {}).get('en', ''),
+        'license': data.get('upstream', {}).get('license', 'Unknown'),
+        'website': data.get('upstream', {}).get('website', ''),
+        'multi_instance': data.get('integration', {}).get('multi_instance', False),
+        'ram_runtime': data.get('integration', {}).get('ram', {}).get('runtime', '50M'),
+        'disk': data.get('integration', {}).get('disk', '50M')
+    }
+    
+    print(json.dumps(app_data))
+except Exception as e:
+    print(f'{{"error": "Failed to parse manifest: {e}"}}', file=sys.stderr)
+    sys.exit(1)
+EOF
+)
+              
+              if [ $? -eq 0 ]; then
+                if [ $app_count -gt 0 ]; then
+                  apps_data="$apps_data,"
+                fi
+                apps_data="$apps_data$app_info"
+                ((app_count++))
+              fi
+            fi
+          fi
+        done
+        
+        apps_data="$apps_data]"
+        
+        echo "Found $app_count apps"
+        echo "apps_data<<EOF" >> $GITHUB_OUTPUT
+        echo "$apps_data" >> $GITHUB_OUTPUT
+        echo "EOF" >> $GITHUB_OUTPUT
+        echo "app_count=$app_count" >> $GITHUB_OUTPUT
+    
+    - name: 🎨 Generate app cards HTML
+      id: generate-html
+      run: |
+        # Generate HTML for app cards
+        python3 << 'EOF'
+import json
+import os
+import sys
+
+# Read apps data
+apps_data = '''${{ steps.detect-apps.outputs.apps_data }}'''
+apps = json.loads(apps_data)
+
+# App icons mapping
+app_icons = {
+    'liberchat': '💬',
+    'contact-cnt-ait': '📇',
+    'nextcloud': '☁️',
+    'wordpress': '📝',
+    'matrix': '💬',
+    'mastodon': '🐘',
+    'peertube': '📺',
+    'gitea': '🦊',
+    'default': '📱'
+}
+
+# Generate HTML cards
+html_cards = []
+
+for app in apps:
+    if 'error' in app:
+        continue
+        
+    app_id = app['id']
+    app_name = app['name']
+    version = app['version'].split('~')[0]  # Remove YunoHost suffix
+    description = app['description_fr'] or app['description_en'] or 'Application YunoHost'
+    icon = app_icons.get(app_id, app_icons['default'])
+    
+    # Determine status
+    status_class = "status-stable"
+    status_text = "Stable"
+    
+    if 'beta' in version.lower() or 'rc' in version.lower():
+        status_class = "status-beta"
+        status_text = "Beta"
+    elif 'alpha' in version.lower() or 'dev' in version.lower():
+        status_class = "status-experimental"
+        status_text = "Expérimental"
+    
+    # Generate features based on app info
+    features = []
+    if app['multi_instance']:
+        features.append('🔄 Multi-instance')
+    if app['license']:
+        features.append(f'📄 {app["license"]}')
+    if 'M' in app['ram_runtime']:
+        ram_mb = app['ram_runtime'].replace('M', '')
+        if int(ram_mb) <= 100:
+            features.append('⚡ Léger')
+    
+    # Limit to 3 features
+    features = features[:3]
+    
+    card_html = f'''
+                <!-- {app_name} App -->
+                <div class="app-card">
+                    <div class="app-header">
+                        <div class="app-icon">{icon}</div>
+                        <div class="app-info">
+                            <h3 class="app-name">{app_name}</h3>
+                            <span class="app-version">v{version}</span>
+                        </div>
+                        <span class="app-status {status_class}">{status_text}</span>
+                    </div>
+                    <p class="app-description">
+                        {description}
+                    </p>
+                    <div class="app-features">
+                        {chr(10).join([f'<span class="feature">{feature}</span>' for feature in features])}
+                    </div>
+                    <div class="app-actions">
+                        <button class="btn btn-primary btn-install" data-app="{app_id}">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7,10 12,15 17,10"/>
+                                <line x1="12" y1="15" x2="12" y2="3"/>
+                            </svg>
+                            Installer
+                        </button>
+                        <a href="https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/{app_id}_ynh" class="btn btn-outline" target="_blank">
+                            Voir le code
+                        </a>
+                    </div>
+                </div>'''
+    
+    html_cards.append(card_html)
+
+# Write HTML cards to output
+with open('app_cards.html', 'w', encoding='utf-8') as f:
+    f.write('\n'.join(html_cards))
+
+print(f"Generated {len(html_cards)} app cards")
+EOF
+    
+    - name: 🔧 Generate JavaScript app data
+      id: generate-js
+      run: |
+        # Generate JavaScript data for apps
+        python3 << 'EOF'
+import json
+
+# Read apps data
+apps_data = '''${{ steps.detect-apps.outputs.apps_data }}'''
+apps = json.loads(apps_data)
+
+# Generate JavaScript objects
+app_commands = {}
+app_names = {}
+
+for app in apps:
+    if 'error' in app:
+        continue
+        
+    app_id = app['id']
+    app_name = app['name']
+    
+    app_commands[app_id] = f"yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/{app_id}_ynh"
+    app_names[app_id] = app_name
+
+# Write JavaScript data
+js_content = f'''
+// Auto-generated app data
+const appCommands = {json.dumps(app_commands, indent=4)};
+
+const appNames = {json.dumps(app_names, indent=4)};
+'''
+
+with open('app_data.js', 'w', encoding='utf-8') as f:
+    f.write(js_content)
+
+print(f"Generated JavaScript data for {len(app_commands)} apps")
+EOF
+    
+    - name: 📝 Update website files
+      run: |
+        # Update index.html with new app cards
+        if [ -f "app_cards.html" ]; then
+          echo "Updating index.html with new app cards..."
+          
+          # Create backup
+          cp docs/index.html docs/index.html.backup
+          
+          # Replace app cards section
+          python3 << 'EOF'
+import re
+
+# Read current HTML
+with open('docs/index.html', 'r', encoding='utf-8') as f:
+    html_content = f.read()
+
+# Read new app cards
+with open('app_cards.html', 'r', encoding='utf-8') as f:
+    new_cards = f.read()
+
+# Find and replace the apps-grid section
+pattern = r'(<div class="apps-grid">)(.*?)(</div>\s*</div>\s*</section>)'
+replacement = r'\1' + new_cards + r'\3'
+
+updated_html = re.sub(pattern, replacement, html_content, flags=re.DOTALL)
+
+# Update app count in stats
+app_count = ${{ steps.detect-apps.outputs.app_count }}
+updated_html = re.sub(r'<div class="stat-number">\d+</div>\s*<div class="stat-label">Applications disponibles</div>', 
+                     f'<div class="stat-number">{app_count}</div>\n                    <div class="stat-label">Applications disponibles</div>', 
+                     updated_html)
+
+# Write updated HTML
+with open('docs/index.html', 'w', encoding='utf-8') as f:
+    f.write(updated_html)
+
+print("Updated index.html successfully")
+EOF
+        fi
+        
+        # Update script.js with new app data
+        if [ -f "app_data.js" ]; then
+          echo "Updating script.js with new app data..."
+          
+          # Read new app data
+          new_app_data=$(cat app_data.js)
+          
+          # Update script.js
+          python3 << 'EOF'
+import re
+
+# Read current JavaScript
+with open('docs/script.js', 'r', encoding='utf-8') as f:
+    js_content = f.read()
+
+# Read new app data
+with open('app_data.js', 'r', encoding='utf-8') as f:
+    new_data = f.read()
+
+# Replace app data section
+pattern = r'const appCommands = \{[^}]*\};[\s\S]*?const appNames = \{[^}]*\};'
+replacement = new_data.strip()
+
+updated_js = re.sub(pattern, replacement, js_content, flags=re.DOTALL)
+
+# Write updated JavaScript
+with open('docs/script.js', 'w', encoding='utf-8') as f:
+    f.write(updated_js)
+
+print("Updated script.js successfully")
+EOF
+        fi
+    
+    - name: 🔍 Check for changes
+      id: check-changes
+      run: |
+        if git diff --quiet docs/; then
+          echo "No changes detected in website"
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes detected in website"
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+          
+          # Show changes
+          echo "Changed files:"
+          git diff --name-only docs/
+        fi
+    
+    - name: 💾 Commit and push changes
+      if: steps.check-changes.outputs.has_changes == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        
+        git add docs/
+        git commit -m "🌐 Auto-update website with new applications
+
+        - Updated app catalog with ${{ steps.detect-apps.outputs.app_count }} applications
+        - Generated new app cards and install commands
+        - Updated statistics and JavaScript data
+        - Automatic sync from marketplace changes
+        
+        Apps updated: $(git diff HEAD~1 --name-only apps/ | grep -E 'manifest\.(toml|json)' | wc -l) manifests"
+        
+        git push
+    
+    - name: 🧹 Cleanup
+      if: always()
+      run: |
+        rm -f app_cards.html app_data.js
+        
+        # Restore backup if something went wrong
+        if [ -f "docs/index.html.backup" ] && [ ! -f "docs/index.html" ]; then
+          mv docs/index.html.backup docs/index.html
+        fi
+        
+        rm -f docs/index.html.backup
+    
+    - name: 💬 Comment on success
+      if: steps.check-changes.outputs.has_changes == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const appCount = '${{ steps.detect-apps.outputs.app_count }}';
+          
+          // Find the latest commit
+          const { data: commits } = await github.rest.repos.listCommits({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            per_page: 1
+          });
+          
+          if (commits.length > 0) {
+            const commitSha = commits[0].sha;
+            
+            await github.rest.repos.createCommitComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              commit_sha: commitSha,
+              body: `🌐 **Site vitrine mis à jour automatiquement !**
+              
+              📱 **Applications synchronisées :** ${appCount}
+              
+              ✅ Le site vitrine a été automatiquement mis à jour avec les dernières applications de la marketplace.
+              
+              🔗 **Voir les changements :**
+              - [Site vitrine](https://liberchat.github.io/LiberChat-Marketplace)
+              - [Catalogue d'applications](https://liberchat.github.io/LiberChat-Marketplace#apps)
+              
+              🚀 **Prochaines étapes :**
+              - Le site sera redéployé automatiquement
+              - Les nouvelles applications seront visibles dans quelques minutes
+              
+              ---
+              *Synchronisation automatique marketplace → site vitrine*`
+            });
+          }
