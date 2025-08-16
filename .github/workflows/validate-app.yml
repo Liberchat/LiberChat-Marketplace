@@ -1,0 +1,231 @@
+name: 🔍 Validation automatique d'application
+
+on:
+  issues:
+    types: [opened, edited]
+
+jobs:
+  validate-app-submission:
+    if: contains(github.event.issue.labels.*.name, 'app-submission')
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout marketplace
+      uses: actions/checkout@v4
+      
+    - name: 🔍 Extraire les informations de l'issue
+      id: extract-info
+      run: |
+        # Extraire l'URL du dépôt depuis l'issue
+        REPO_URL=$(echo "${{ github.event.issue.body }}" | grep -oP "Dépôt GitHub YunoHost.*: \K.*" | head -1 | tr -d ' ')
+        echo "repo_url=$REPO_URL" >> $GITHUB_OUTPUT
+        
+        # Extraire le nom de l'app
+        APP_NAME=$(echo "${{ github.event.issue.title }}" | sed 's/\[APP\] //' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+        echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+        
+        echo "Repository URL: $REPO_URL"
+        echo "App Name: $APP_NAME"
+    
+    - name: 📦 Cloner l'application soumise
+      if: steps.extract-info.outputs.repo_url != ''
+      run: |
+        git clone ${{ steps.extract-info.outputs.repo_url }} temp_app
+        ls -la temp_app/
+    
+    - name: ✅ Vérifier la structure YunoHost
+      id: validate-structure
+      run: |
+        cd temp_app
+        
+        # Vérifier les fichiers obligatoires
+        VALIDATION_ERRORS=""
+        
+        if [ ! -f "manifest.toml" ] && [ ! -f "manifest.json" ]; then
+          VALIDATION_ERRORS="❌ Fichier manifest.toml ou manifest.json manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        if [ ! -f "scripts/install" ]; then
+          VALIDATION_ERRORS="❌ Script scripts/install manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        if [ ! -f "scripts/remove" ]; then
+          VALIDATION_ERRORS="❌ Script scripts/remove manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        if [ ! -f "scripts/upgrade" ]; then
+          VALIDATION_ERRORS="❌ Script scripts/upgrade manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        if [ ! -f "scripts/backup" ]; then
+          VALIDATION_ERRORS="❌ Script scripts/backup manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        if [ ! -f "scripts/restore" ]; then
+          VALIDATION_ERRORS="❌ Script scripts/restore manquant\n$VALIDATION_ERRORS"
+        fi
+        
+        # Vérifier la syntaxe du manifest
+        if [ -f "manifest.toml" ]; then
+          python3 -c "import tomllib; tomllib.load(open('manifest.toml', 'rb'))" 2>/dev/null || {
+            VALIDATION_ERRORS="❌ Syntaxe manifest.toml invalide\n$VALIDATION_ERRORS"
+          }
+        fi
+        
+        if [ -f "manifest.json" ]; then
+          python3 -m json.tool manifest.json > /dev/null || {
+            VALIDATION_ERRORS="❌ Syntaxe manifest.json invalide\n$VALIDATION_ERRORS"
+          }
+        fi
+        
+        # Vérifier la syntaxe des scripts
+        for script in scripts/*; do
+          if [ -f "$script" ] && [ -x "$script" ]; then
+            bash -n "$script" || {
+              VALIDATION_ERRORS="❌ Erreur de syntaxe dans $(basename $script)\n$VALIDATION_ERRORS"
+            }
+          fi
+        done
+        
+        if [ -z "$VALIDATION_ERRORS" ]; then
+          echo "validation_status=✅ SUCCÈS" >> $GITHUB_OUTPUT
+          echo "validation_errors=Tous les tests de structure ont réussi !" >> $GITHUB_OUTPUT
+        else
+          echo "validation_status=❌ ÉCHEC" >> $GITHUB_OUTPUT
+          echo "validation_errors<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$VALIDATION_ERRORS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: 🔒 Vérification de sécurité basique
+      id: security-check
+      run: |
+        cd temp_app
+        
+        SECURITY_WARNINGS=""
+        
+        # Vérifier les commandes dangereuses
+        if grep -r "rm -rf /" scripts/ 2>/dev/null; then
+          SECURITY_WARNINGS="⚠️ Commande 'rm -rf /' détectée\n$SECURITY_WARNINGS"
+        fi
+        
+        if grep -r "chmod 777" scripts/ 2>/dev/null; then
+          SECURITY_WARNINGS="⚠️ Permissions 777 détectées\n$SECURITY_WARNINGS"
+        fi
+        
+        if grep -r "curl.*|.*sh" scripts/ 2>/dev/null; then
+          SECURITY_WARNINGS="⚠️ Téléchargement et exécution direct détecté\n$SECURITY_WARNINGS"
+        fi
+        
+        # Vérifier les mots de passe en dur
+        if grep -r "password.*=" scripts/ | grep -v "YNH_APP_ARG" 2>/dev/null; then
+          SECURITY_WARNINGS="⚠️ Possible mot de passe en dur détecté\n$SECURITY_WARNINGS"
+        fi
+        
+        if [ -z "$SECURITY_WARNINGS" ]; then
+          echo "security_status=✅ SÉCURISÉ" >> $GITHUB_OUTPUT
+          echo "security_warnings=Aucun problème de sécurité détecté" >> $GITHUB_OUTPUT
+        else
+          echo "security_status=⚠️ AVERTISSEMENTS" >> $GITHUB_OUTPUT
+          echo "security_warnings<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$SECURITY_WARNINGS" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: 📊 Analyser les métadonnées
+      id: analyze-metadata
+      run: |
+        cd temp_app
+        
+        if [ -f "manifest.toml" ]; then
+          APP_ID=$(python3 -c "import tomllib; print(tomllib.load(open('manifest.toml', 'rb'))['id'])" 2>/dev/null || echo "unknown")
+          APP_VERSION=$(python3 -c "import tomllib; print(tomllib.load(open('manifest.toml', 'rb'))['version'])" 2>/dev/null || echo "unknown")
+          APP_DESCRIPTION=$(python3 -c "import tomllib; d=tomllib.load(open('manifest.toml', 'rb')); print(d.get('description', {}).get('fr', d.get('description', {}).get('en', 'No description')))" 2>/dev/null || echo "No description")
+        elif [ -f "manifest.json" ]; then
+          APP_ID=$(python3 -c "import json; print(json.load(open('manifest.json'))['id'])" 2>/dev/null || echo "unknown")
+          APP_VERSION=$(python3 -c "import json; print(json.load(open('manifest.json'))['version'])" 2>/dev/null || echo "unknown")
+          APP_DESCRIPTION=$(python3 -c "import json; d=json.load(open('manifest.json')); print(d.get('description', {}).get('fr', d.get('description', {}).get('en', 'No description')))" 2>/dev/null || echo "No description")
+        fi
+        
+        echo "app_id=$APP_ID" >> $GITHUB_OUTPUT
+        echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+        echo "app_description=$APP_DESCRIPTION" >> $GITHUB_OUTPUT
+    
+    - name: 💬 Commenter les résultats de validation
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const validationStatus = '${{ steps.validate-structure.outputs.validation_status }}';
+          const validationErrors = '${{ steps.validate-structure.outputs.validation_errors }}';
+          const securityStatus = '${{ steps.security-check.outputs.security_status }}';
+          const securityWarnings = '${{ steps.security-check.outputs.security_warnings }}';
+          const appId = '${{ steps.analyze-metadata.outputs.app_id }}';
+          const appVersion = '${{ steps.analyze-metadata.outputs.app_version }}';
+          const appDescription = '${{ steps.analyze-metadata.outputs.app_description }}';
+          
+          const comment = `## 🤖 Rapport de validation automatique
+          
+          ### 📋 Informations détectées
+          - **ID de l'application** : \`${appId}\`
+          - **Version** : \`${appVersion}\`
+          - **Description** : ${appDescription}
+          
+          ### ✅ Validation de structure
+          **Statut** : ${validationStatus}
+          
+          ${validationErrors}
+          
+          ### 🔒 Vérification de sécurité
+          **Statut** : ${securityStatus}
+          
+          ${securityWarnings}
+          
+          ### 🎯 Prochaines étapes
+          
+          ${validationStatus.includes('✅') ? 
+            `🎉 **Félicitations !** Votre application passe tous les tests de base.
+            
+            Un mainteneur va maintenant :
+            1. Effectuer une revue manuelle du code
+            2. Tester l'installation en environnement réel
+            3. Valider la sécurité et les bonnes pratiques
+            4. Intégrer l'application si tout est conforme
+            
+            **Temps estimé** : 2-5 jours ouvrés` :
+            `❌ **Des corrections sont nécessaires** avant l'intégration.
+            
+            Veuillez corriger les erreurs listées ci-dessus et mettre à jour votre dépôt.
+            Une fois corrigé, éditez cette issue pour relancer la validation automatique.`
+          }
+          
+          ---
+          *Validation automatique effectuée le ${new Date().toLocaleString('fr-FR')}*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+          // Ajouter des labels selon le résultat
+          if (validationStatus.includes('✅')) {
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['validation-passed', 'ready-for-review']
+            });
+          } else {
+            github.rest.issues.addLabels({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              labels: ['validation-failed', 'needs-fixes']
+            });
+          }
+    
+    - name: 🧹 Nettoyage
+      if: always()
+      run: |
+        rm -rf temp_app

@@ -1,0 +1,148 @@
+name: 🚀 Intégration automatique d'application
+
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  auto-integrate:
+    if: |
+      contains(github.event.issue.labels.*.name, 'validation-passed') &&
+      contains(github.event.issue.labels.*.name, 'ready-for-review') &&
+      contains(github.event.comment.body, '/integrate') &&
+      (github.event.comment.author_association == 'OWNER' || github.event.comment.author_association == 'COLLABORATOR')
+    
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 📥 Checkout marketplace
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+    
+    - name: 🔍 Extraire les informations de l'issue
+      id: extract-info
+      run: |
+        # Extraire l'URL du dépôt depuis l'issue
+        REPO_URL=$(echo "${{ github.event.issue.body }}" | grep -oP "Dépôt GitHub YunoHost.*: \K.*" | head -1 | tr -d ' ')
+        echo "repo_url=$REPO_URL" >> $GITHUB_OUTPUT
+        
+        # Extraire le nom de l'app
+        APP_NAME=$(echo "${{ github.event.issue.title }}" | sed 's/\[APP\] //' | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g')
+        echo "app_name=$APP_NAME" >> $GITHUB_OUTPUT
+        
+        # Extraire la description
+        APP_DESCRIPTION=$(echo "${{ github.event.issue.body }}" | grep -A1 "Description courte" | tail -1 | sed 's/^- \*\*//' | sed 's/\*\* : //')
+        echo "app_description=$APP_DESCRIPTION" >> $GITHUB_OUTPUT
+        
+        # Extraire la version
+        APP_VERSION=$(echo "${{ github.event.issue.body }}" | grep -A1 "Version actuelle" | tail -1 | sed 's/^- \*\*//' | sed 's/\*\* : //')
+        echo "app_version=$APP_VERSION" >> $GITHUB_OUTPUT
+    
+    - name: 📦 Intégrer l'application
+      run: |
+        # Utiliser le script add-app.sh existant
+        chmod +x scripts/add-app.sh
+        ./scripts/add-app.sh "${{ steps.extract-info.outputs.repo_url }}" "${{ steps.extract-info.outputs.app_name }}" "${{ steps.extract-info.outputs.app_description }}" "${{ steps.extract-info.outputs.app_version }}"
+    
+    - name: 🔧 Configuration Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+    
+    - name: 💾 Commit et push
+      run: |
+        git add .
+        git commit -m "✨ Auto-integrate ${{ steps.extract-info.outputs.app_name }} application
+
+        - Added from issue #${{ github.event.issue.number }}
+        - Automatic integration via /integrate command
+        - Passed all validation tests
+        
+        Co-authored-by: ${{ github.event.issue.user.login }} <${{ github.event.issue.user.login }}@users.noreply.github.com>"
+        
+        git push
+    
+    - name: 💬 Commenter le succès
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `## 🎉 Application intégrée avec succès !
+          
+          Votre application **${{ steps.extract-info.outputs.app_name }}** a été automatiquement ajoutée à la marketplace Liberchat.
+          
+          ### 📦 Installation
+          Les utilisateurs peuvent maintenant installer votre application avec :
+          \`\`\`bash
+          yunohost app install https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/${{ steps.extract-info.outputs.app_name }}_ynh
+          \`\`\`
+          
+          ### 🔄 Mise à jour
+          \`\`\`bash
+          yunohost app upgrade ${{ steps.extract-info.outputs.app_name }} -u https://github.com/Liberchat/LiberChat-Marketplace/tree/main/apps/${{ steps.extract-info.outputs.app_name }}_ynh
+          \`\`\`
+          
+          ### 🎯 Prochaines étapes
+          - Votre application est maintenant visible sur la marketplace
+          - Les notifications de mise à jour sont automatiquement configurées
+          - N'hésitez pas à promouvoir votre app auprès de la communauté !
+          
+          **Merci pour votre contribution à la marketplace Liberchat ! 🚀**
+          
+          ---
+          *Intégration automatique effectuée le ${new Date().toLocaleString('fr-FR')}*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+          // Fermer l'issue et ajouter le label
+          github.rest.issues.update({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            state: 'closed'
+          });
+          
+          github.rest.issues.addLabels({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: ['integrated']
+          });
+    
+    - name: ❌ Gestion des erreurs
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `## ❌ Erreur lors de l'intégration automatique
+          
+          Une erreur s'est produite lors de l'intégration automatique de votre application.
+          
+          **Prochaines étapes :**
+          1. Un mainteneur va examiner le problème
+          2. L'intégration sera effectuée manuellement si nécessaire
+          3. Vous serez notifié une fois l'application intégrée
+          
+          **Logs d'erreur disponibles dans les Actions GitHub.**
+          
+          ---
+          *Tentative d'intégration automatique échouée le ${new Date().toLocaleString('fr-FR')}*`;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+          github.rest.issues.addLabels({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            labels: ['integration-failed', 'manual-review-needed']
+          });
